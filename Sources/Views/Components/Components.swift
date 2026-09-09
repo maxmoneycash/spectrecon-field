@@ -65,10 +65,18 @@ struct LiveSightingRow: View {
                 Text(observation.displayName)
                     .font(.subheadline)
                     .lineLimit(1)
-                Text(Format.rssi(observation.rssi))
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
+                HStack(spacing: Spacing.xs) {
+                    Text(Format.rssi(observation.rssi))
+                        .font(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                    if observation.authMode != "[BLE]", !observation.authMode.isEmpty {
+                        Text(observation.authMode)
+                            .font(.caption2)
+                            .foregroundStyle(Color.accentColor)
+                            .lineLimit(1)
+                    }
+                }
             }
             Spacer(minLength: Spacing.xs)
             Image(systemName: observation.type.symbolName)

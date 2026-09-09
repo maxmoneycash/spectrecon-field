@@ -79,6 +79,21 @@ final class WigleCSVTests: XCTestCase {
             "[RIG:biscuit]"
         )
         XCTAssertEqual(
+            BLEScannerService.classify(
+                name: nil,
+                serviceUUIDs: ["00003082-0000-1000-8000-00805F9B34FB"]
+            ),
+            "[GADGET:flipper]"
+        )
+        XCTAssertEqual(
+            BLEScannerService.classify(name: "Flipper White", serviceUUIDs: []),
+            "[GADGET:flipper]"
+        )
+        XCTAssertEqual(
+            BLEScannerService.classify(name: "ESP32 Marauder", serviceUUIDs: []),
+            "[RIG:marauder]"
+        )
+        XCTAssertEqual(
             BLEScannerService.classify(name: "AirPods", serviceUUIDs: []),
             "[BLE]"
         )

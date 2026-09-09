@@ -65,32 +65,12 @@ final class BLEScannerService: NSObject {
         }
     }
 
-    /// Known advertised service UUIDs. Meshtastic from firmware docs
-    /// (6ba1b218-15a8-461f-9fa8-5dcae273eafd); Nordic UART is a common ESP32 rig.
-    nonisolated static let meshtasticServiceUUID = "6BA1B218-15A8-461F-9FA8-5DCAE273EAFD"
-    nonisolated static let nordicUARTServiceUUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
-    nonisolated static let biscuitServiceUUID = "4FAFC201-1FB5-459E-8FCC-C5C9C331914B"
+    nonisolated static let meshtasticServiceUUID = GadgetCatalog.meshtasticServiceUUID
+    nonisolated static let nordicUARTServiceUUID = GadgetCatalog.nordicUARTServiceUUID
+    nonisolated static let biscuitServiceUUID = GadgetCatalog.biscuitServiceUUID
 
     nonisolated static func classify(name: String?, serviceUUIDs: [String]) -> String {
-        let raw = name ?? ""
-        let lowered = raw.lowercased()
-        let uuids = Set(serviceUUIDs.map { $0.uppercased() })
-        if uuids.contains(meshtasticServiceUUID) || raw.hasPrefix("Meshtastic_") {
-            return "[MESH:meshtastic]"
-        }
-        if raw.hasPrefix("MeshCore") {
-            return "[MESH:meshcore]"
-        }
-        if uuids.contains(biscuitServiceUUID) || raw == "Biscuit" {
-            return "[RIG:biscuit]"
-        }
-        if uuids.contains(nordicUARTServiceUUID) {
-            return "[BLE:UART]"
-        }
-        if lowered.contains("meshtastic") {
-            return "[MESH:meshtastic]"
-        }
-        return "[BLE]"
+        GadgetCatalog.authMode(name: name, serviceUUIDs: serviceUUIDs)
     }
 
     private func recordSighting(id: UUID, name: String?, rssi: Int, serviceUUIDs: [String]) {

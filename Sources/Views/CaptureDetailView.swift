@@ -166,6 +166,14 @@ private struct ObservationRow: View {
                     .font(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(observation.rssi.rssiColor)
+                if observation.authMode != "[BLE]", !observation.authMode.isEmpty,
+                   !observation.authMode.hasPrefix("[ESS]"),
+                   !observation.authMode.hasPrefix("[WPA") {
+                    Text(observation.authMode)
+                        .font(.caption2)
+                        .foregroundStyle(Color.accentColor)
+                        .lineLimit(1)
+                }
                 Text(observation.firstSeen.formatted(date: .omitted, time: .shortened))
                     .font(.caption)
                     .foregroundStyle(.secondary)
