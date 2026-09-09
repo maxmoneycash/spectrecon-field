@@ -102,3 +102,6 @@ project.yml                     xcodegen spec (bundle id com.spectrecon.field)
   to `mesh.nodes`. Field tags the deck's BLE name `Lilyshark <short>` as
   `[RIG:lilyshark]` and shows the node-number suffix (`4B01` → LoRa
   `!****4B01`) so a drive CSV and a T-Deck capture debrief as one identity.
+  Deck GPS without the phone beside the radio is USB `LSK T`
+  (`spectrecon listen /dev/cu.usbmodem…` or `import deck.lsk`) — the LSK
+  GATT service is not on current T-Deck firmware.
