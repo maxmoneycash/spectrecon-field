@@ -7,6 +7,7 @@ struct DriveMapView: View {
     @Environment(LocationService.self) private var location
     @Environment(BLEScannerService.self) private var ble
     @Environment(CaptureStore.self) private var store
+    @Environment(FieldRouter.self) private var router
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.openURL) private var openURL
 
@@ -18,33 +19,8 @@ struct DriveMapView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                map
-                if location.isDenied {
-                    StatusCard(
-                        title: "Location Off",
-                        message: "Field needs your GPS track to place RF observations on the map.",
-                        systemImage: "location.slash",
-                        actionTitle: "Open Settings",
-                        action: openSettings
-                    )
-                } else if ble.state == .unauthorized {
-                    StatusCard(
-                        title: "Bluetooth Off-Limits",
-                        message: "Allow Bluetooth to record nearby BLE devices while you drive.",
-                        systemImage: "antenna.radiowaves.left.and.right.slash",
-                        actionTitle: "Open Settings",
-                        action: openSettings
-                    )
-                } else if ble.state == .poweredOff {
-                    StatusCard(
-                        title: "Bluetooth Is Off",
-                        message: "Turn Bluetooth on to scan for nearby devices. GPS recording still works.",
-                        systemImage: "antenna.radiowaves.left.and.right"
-                    )
-                }
-            }
-            .safeAreaInset(edge: .top) { topStrip }
+            map
+            .safeAreaInset(edge: .top) { topChrome }
             .safeAreaInset(edge: .bottom) { bottomChrome }
             .sensoryFeedback(.success, trigger: savedCount)
             .toolbar(.hidden, for: .navigationBar)
@@ -80,6 +56,30 @@ struct DriveMapView: View {
     }
 
     // MARK: - Chrome
+
+    private var topChrome: some View {
+        VStack(spacing: Spacing.xs) {
+            topStrip
+            if location.isDenied {
+                StatusBanner(
+                    title: "Location is off — observations won’t be placed on the map.",
+                    actionTitle: "Settings",
+                    action: openSettings
+                )
+                .padding(.horizontal, Spacing.md)
+            } else if ble.state == .unauthorized {
+                StatusBanner(
+                    title: "Bluetooth access is off — GPS still records.",
+                    actionTitle: "Settings",
+                    action: openSettings
+                )
+                .padding(.horizontal, Spacing.md)
+            } else if ble.state == .poweredOff {
+                StatusBanner(title: "Bluetooth is off — GPS still records.")
+                    .padding(.horizontal, Spacing.md)
+            }
+        }
+    }
 
     private var topStrip: some View {
         HStack(spacing: Spacing.sm) {
@@ -160,9 +160,7 @@ struct DriveMapView: View {
 
     @ViewBuilder
     private var controlButton: some View {
-        if location.isDenied {
-            EmptyView()
-        } else if location.isRecording {
+        if location.isRecording {
             HoldToConfirmButton(title: "Hold to Stop", systemImage: "stop.circle.fill") {
                 stopDrive()
             }
@@ -243,6 +241,7 @@ struct DriveMapView: View {
         if let saved = try? store.save(capture) {
             lastSavedName = saved.name
             savedCount += 1
+            router.open(saved)
         }
         ble.reset()
         location.clearTrack()
@@ -294,5 +293,6 @@ struct AboutView: View {
         .environment(LocationService())
         .environment(BLEScannerService())
         .environment(CaptureStore(previewCaptures: []))
+        .environment(FieldRouter())
         .preferredColorScheme(.dark)
 }

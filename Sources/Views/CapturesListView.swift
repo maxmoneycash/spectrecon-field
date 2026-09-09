@@ -5,12 +5,14 @@ import UniformTypeIdentifiers
 /// detail screen or row context menu, import WiGLE CSVs from Files.
 struct CapturesListView: View {
     @Environment(CaptureStore.self) private var store
+    @Environment(FieldRouter.self) private var router
     @Namespace private var zoomSpace
 
     @State private var showImporter = false
     @State private var share: SharePayload?
     @State private var notice: Notice?
     @State private var searchText = ""
+    @State private var path = NavigationPath()
 
     private var filtered: [Capture] {
         guard !searchText.isEmpty else { return store.captures }
@@ -20,7 +22,7 @@ struct CapturesListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if store.captures.isEmpty {
                     ContentUnavailableView(
@@ -88,7 +90,15 @@ struct CapturesListView: View {
             } message: {
                 Text(notice?.message ?? "")
             }
+            .onAppear { consumePendingCapture() }
+            .onChange(of: router.pendingCapture?.id) { consumePendingCapture() }
         }
+    }
+
+    private func consumePendingCapture() {
+        guard let capture = router.pendingCapture else { return }
+        path.append(capture)
+        router.pendingCapture = nil
     }
 
     private var noticePresented: Binding<Bool> {
@@ -108,10 +118,7 @@ struct CapturesListView: View {
         case .success(let url):
             do {
                 let capture = try store.importCSV(from: url)
-                notice = Notice(
-                    title: "Import Complete",
-                    message: "\(capture.observations.count) observations from “\(capture.name)”."
-                )
+                router.open(capture)
             } catch {
                 notice = Notice(title: "Import Failed", message: error.localizedDescription)
             }
@@ -149,6 +156,7 @@ private struct CaptureRow: View {
 
 #Preview("Captures") {
     CapturesListView()
+        .environment(FieldRouter())
         .environment(CaptureStore(previewCaptures: [
             Capture(
                 name: "Drive · Sep 8, 2026 at 9:41 PM",

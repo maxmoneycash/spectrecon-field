@@ -16,7 +16,10 @@ unavailable for this kind of app. So:
 - **CoreLocation** provides the GPS track, including in the background
   (When-In-Use, then Always, plus `location` background mode) while a drive is recording.
 - **CoreBluetooth** provides full BLE scanning — peripheral UUID, advertised
-  name, RSSI. This *is* RF wardriving data and works natively.
+  name, RSSI. Advertised Meshtastic / MeshCore / Biscuit rigs are tagged in
+  the WiGLE `AuthMode` column (`[MESH:meshtastic]`, `[MESH:meshcore]`,
+  `[RIG:biscuit]`) without connecting. This *is* RF wardriving data and works
+  natively.
 - **WiFi capture is not possible on-device.** WiFi rows arrive by importing
   WiGLE CSVs from external rigs (ESP32 etc.) via the share sheet or Files, and
   are fully supported for debrief and re-export.
@@ -37,7 +40,9 @@ Or build from the CLI:
 ```sh
 xcodegen
 xcodebuild -project SpectreconField.xcodeproj -scheme SpectreconField \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
+  -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project SpectreconField.xcodeproj -scheme SpectreconField \
+  -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
 ## Features

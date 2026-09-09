@@ -79,7 +79,9 @@ struct CaptureDetailView: View {
                         ContentUnavailableView(
                             "Nothing Here",
                             systemImage: "antenna.radiowaves.left.and.right",
-                            description: Text("No \(filter.rawValue) observations in this capture.")
+                            description: Text(filter == .all
+                                ? "No RF observations in this capture. BLE devices appear when Bluetooth is on; Wi-Fi arrives from an imported WiGLE CSV."
+                                : "No \(filter.rawValue) observations in this capture.")
                         )
                     } else {
                         ContentUnavailableView.search(text: searchText)

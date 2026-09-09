@@ -5,15 +5,16 @@ struct SpectreconFieldApp: App {
     @State private var locationService = LocationService()
     @State private var bleService = BLEScannerService()
     @State private var store = CaptureStore()
+    @State private var router = FieldRouter()
     @State private var importNotice: Notice?
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                Tab("Drive", systemImage: "map") {
+            TabView(selection: $router.tab) {
+                Tab("Drive", systemImage: "map", value: AppTab.drive) {
                     DriveMapView()
                 }
-                Tab("Captures", systemImage: "archivebox") {
+                Tab("Captures", systemImage: "archivebox", value: AppTab.captures) {
                     CapturesListView()
                 }
             }
@@ -22,6 +23,7 @@ struct SpectreconFieldApp: App {
             .environment(locationService)
             .environment(bleService)
             .environment(store)
+            .environment(router)
             .onAppear {
                 bleService.locationProvider = { [locationService] in
                     locationService.currentFix
@@ -50,6 +52,7 @@ struct SpectreconFieldApp: App {
         guard url.pathExtension.lowercased() == "csv" else { return }
         do {
             let capture = try store.importCSV(from: url)
+            router.open(capture)
             importNotice = Notice(
                 title: "Import Complete",
                 message: "\(capture.observations.count) observations from “\(capture.name)”."

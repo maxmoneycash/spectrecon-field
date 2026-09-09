@@ -83,6 +83,7 @@ struct LiveSightingRow: View {
 
 /// Hold-to-confirm control: press and hold for `duration` seconds while a fill
 /// sweeps across; release early and the fill snaps back. Used for Stop Drive.
+/// VoiceOver activates immediately via the Confirm action (hold is a sighted affordance).
 struct HoldToConfirmButton: View {
     let title: String
     let systemImage: String
@@ -93,7 +94,9 @@ struct HoldToConfirmButton: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var progress: Double = 0
     @State private var isPressing = false
-    @State private var holdTask: Task<Void, Never>?
+    @State private var didComplete = false
+
+    private var holdDuration: TimeInterval { reduceMotion ? 0.15 : duration }
 
     var body: some View {
         Label(title, systemImage: systemImage)
@@ -114,39 +117,56 @@ struct HoldToConfirmButton: View {
             .contentShape(Surfaces.button)
             .scaleEffect(isPressing && !reduceMotion ? 0.97 : 1)
             .animation(Motion.press, value: isPressing)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in beginHold() }
-                    .onEnded { _ in endHold() }
+            .onLongPressGesture(
+                minimumDuration: holdDuration,
+                maximumDistance: 120,
+                pressing: { pressing in
+                    isPressing = pressing
+                    if pressing {
+                        didComplete = false
+                        withAnimation(.linear(duration: holdDuration)) { progress = 1 }
+                    } else if !didComplete {
+                        withAnimation(Motion.adaptive(Motion.snapBack, reduceMotion: reduceMotion)) {
+                            progress = 0
+                        }
+                    }
+                },
+                perform: {
+                    didComplete = true
+                    progress = 0
+                    isPressing = false
+                    onComplete()
+                }
             )
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
             .accessibilityLabel(title)
             .accessibilityHint("Touch and hold to confirm")
             .accessibilityAction(named: "Confirm") { onComplete() }
     }
+}
 
-    private func beginHold() {
-        guard holdTask == nil else { return }
-        isPressing = true
-        let hold = reduceMotion ? 0.15 : duration
-        withAnimation(.linear(duration: hold)) { progress = 1 }
-        holdTask = Task { @MainActor in
-            try? await Task.sleep(for: .seconds(hold))
-            guard !Task.isCancelled else { return }
-            holdTask = nil
-            isPressing = false
-            progress = 0
-            onComplete()
-        } as Task<Void, Never>
-    }
+/// Compact non-blocking status line over the map (Bluetooth off, location denied).
+struct StatusBanner: View {
+    let title: String
+    var actionTitle: String?
+    var action: (() -> Void)?
 
-    private func endHold() {
-        guard let task = holdTask else { return }
-        task.cancel()
-        holdTask = nil
-        isPressing = false
-        withAnimation(Motion.adaptive(Motion.snapBack, reduceMotion: reduceMotion)) {
-            progress = 0
+    var body: some View {
+        HStack(spacing: Spacing.sm) {
+            Text(title)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if let actionTitle, let action {
+                Button(actionTitle, action: action)
+                    .font(.footnote.weight(.semibold))
+                    .frame(minHeight: 44)
+            }
         }
+        .padding(.horizontal, Spacing.md)
+        .padding(.vertical, Spacing.xs)
+        .background(.regularMaterial, in: Surfaces.card)
     }
 }
 

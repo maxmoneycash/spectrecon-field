@@ -10,7 +10,7 @@ enum WigleCSV {
     static let versionHeader = "WigleWifi-1.4"
     static let columnHeader = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type"
 
-    enum CSVError: LocalizedError {
+    enum CSVError: LocalizedError, Equatable {
         case notWigleFile
         case missingHeader
         case noObservations
