@@ -166,7 +166,13 @@ private struct ObservationRow: View {
                     .font(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(observation.rssi.rssiColor)
-                if observation.authMode != "[BLE]", !observation.authMode.isEmpty,
+                if let suffix = GadgetCatalog.lilysharkShortName(from: observation.name) {
+                    Text("LoRa !****\(suffix)")
+                        .font(.caption2)
+                        .monospaced()
+                        .foregroundStyle(Color.accentColor)
+                        .lineLimit(1)
+                } else if observation.authMode != "[BLE]", !observation.authMode.isEmpty,
                    !observation.authMode.hasPrefix("[ESS]"),
                    !observation.authMode.hasPrefix("[WPA") {
                     Text(observation.authMode)

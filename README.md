@@ -100,4 +100,5 @@ project.yml                     xcodegen spec (bundle id com.spectrecon.field)
 - **Lilyshark T-Deck `.lscap`**: LoRa captures from the deck import on the
   CLI (`spectrecon import capture.lscap`) and join heard Meshtastic node IDs
   to `mesh.nodes`. Field tags the deck's BLE name `Lilyshark <short>` as
-  `[RIG:lilyshark]`.
+  `[RIG:lilyshark]` and shows the node-number suffix (`4B01` → LoRa
+  `!****4B01`) so a drive CSV and a T-Deck capture debrief as one identity.

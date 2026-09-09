@@ -70,7 +70,13 @@ struct LiveSightingRow: View {
                         .font(.caption)
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
-                    if observation.authMode != "[BLE]", !observation.authMode.isEmpty {
+                    if let suffix = GadgetCatalog.lilysharkShortName(from: observation.name) {
+                        Text("LoRa !****\(suffix)")
+                            .font(.caption2)
+                            .monospaced()
+                            .foregroundStyle(Color.accentColor)
+                            .lineLimit(1)
+                    } else if observation.authMode != "[BLE]", !observation.authMode.isEmpty {
                         Text(observation.authMode)
                             .font(.caption2)
                             .foregroundStyle(Color.accentColor)

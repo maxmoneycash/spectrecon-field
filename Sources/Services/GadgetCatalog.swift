@@ -7,6 +7,9 @@ struct GadgetHit: Equatable, Sendable {
     let label: String
     let family: String
     let authMode: String
+    /// Firmware BLE/mesh short name (`Lilyshark 4B01` → `4B01`).
+    /// Low 16 bits of the Meshtastic node number; joins LoRa `!xxxx4B01`.
+    let nodeSuffix: String?
 }
 
 enum GadgetCatalog {
@@ -60,7 +63,13 @@ enum GadgetCatalog {
         }
         if raw.hasPrefix("Lilyshark") || lowered.hasPrefix("lilyshark")
             || uuids.contains(lilysharkLSKServiceUUID) {
-            return hit("lilyshark", "Lilyshark T-Deck", "rig", "[RIG:lilyshark]")
+            return hit(
+                "lilyshark",
+                "Lilyshark T-Deck",
+                "rig",
+                "[RIG:lilyshark]",
+                nodeSuffix: lilysharkShortName(from: raw)
+            )
         }
         if uuids.contains(meshtasticServiceUUID) || raw.hasPrefix("Meshtastic_") || lowered.contains("meshtastic") {
             return hit("meshtastic", "Meshtastic node", "mesh", "[MESH:meshtastic]")
@@ -84,7 +93,31 @@ enum GadgetCatalog {
         identify(name: name, serviceUUIDs: serviceUUIDs)?.authMode ?? "[BLE]"
     }
 
-    private static func hit(_ id: String, _ label: String, _ family: String, _ auth: String) -> GadgetHit {
-        GadgetHit(id: id, label: label, family: family, authMode: auth)
+    /// Firmware advertises `Lilyshark %04X` (space) and names the node
+    /// `Lilyshark-%04X`. The four hex digits are `node_num & 0xffff`.
+    static func lilysharkShortName(from name: String) -> String? {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        for separator in [" ", "-", "_"] {
+            let prefix = "Lilyshark" + separator
+            guard trimmed.count == prefix.count + 4,
+                  trimmed.lowercased().hasPrefix(prefix.lowercased()) else {
+                continue
+            }
+            let suffix = String(trimmed.suffix(4))
+            if suffix.allSatisfy(\.isHexDigit) {
+                return suffix.uppercased()
+            }
+        }
+        return nil
+    }
+
+    private static func hit(
+        _ id: String,
+        _ label: String,
+        _ family: String,
+        _ auth: String,
+        nodeSuffix: String? = nil
+    ) -> GadgetHit {
+        GadgetHit(id: id, label: label, family: family, authMode: auth, nodeSuffix: nodeSuffix)
     }
 }
