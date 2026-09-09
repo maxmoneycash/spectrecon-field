@@ -97,3 +97,7 @@ project.yml                     xcodegen spec (bundle id com.spectrecon.field)
 - **On-device debrief against the spectrecon DuckDB** via duckdb-swift: run
   licensing-intelligence queries against imported captures without leaving
   the field.
+- **Lilyshark T-Deck `.lscap`**: LoRa captures from the deck import on the
+  CLI (`spectrecon import capture.lscap`) and join heard Meshtastic node IDs
+  to `mesh.nodes`. Field tags the deck's BLE name `Lilyshark <short>` as
+  `[RIG:lilyshark]`.
