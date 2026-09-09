@@ -1,0 +1,40 @@
+name: SpectreconField
+options:
+  bundleIdPrefix: com.spectrecon
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+targets:
+  SpectreconField:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.spectrecon.field
+        PRODUCT_NAME: SpectreconField
+        INFOPLIST_FILE: Support/Info.plist
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: "NO"
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: "NO"
+schemes:
+  SpectreconField:
+    build:
+      targets:
+        SpectreconField: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    archive:
+      config: Release

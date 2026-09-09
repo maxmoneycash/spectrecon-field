@@ -1,0 +1,8 @@
+xcuserdata/
+DerivedData/
+.build/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+.DS_Store
+SpectreconField.xcodeproj/
