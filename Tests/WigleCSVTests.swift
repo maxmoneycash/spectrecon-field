@@ -69,6 +69,13 @@ final class WigleCSVTests: XCTestCase {
         )
         XCTAssertEqual(
             BLEScannerService.classify(
+                name: "Lilyshark 4B01",
+                serviceUUIDs: [BLEScannerService.meshtasticServiceUUID]
+            ),
+            "[RIG:lilyshark]"
+        )
+        XCTAssertEqual(
+            BLEScannerService.classify(
                 name: "ESP32",
                 serviceUUIDs: [BLEScannerService.nordicUARTServiceUUID]
             ),
