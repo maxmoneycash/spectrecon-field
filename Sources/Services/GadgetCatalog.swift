@@ -16,8 +16,8 @@ enum GadgetCatalog {
     static let meshtasticServiceUUID = "6BA1B218-15A8-461F-9FA8-5DCAE273EAFD"
     static let nordicUARTServiceUUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
     static let biscuitServiceUUID = "4FAFC201-1FB5-459E-8FCC-C5C9C331914B"
-    /// Lilyshark analyzer GATT (docs/lsk-ble-contract.md). Firmware still
-    /// primarily advertises Meshtastic's service; the local name is the tell.
+    /// Lilyshark analyzer GATT (docs/lsk-ble-contract.md). Not advertised on
+    /// current T-Deck firmware — the local name is the tell, not this UUID.
     static let lilysharkLSKServiceUUID = "6C736B00-9C1D-4B7A-B3F2-1D0E5A7C4E10"
     static let flipperSerialUUID = "8FE5B3D5-2E7F-4A98-2A48-7ACC60FE0000"
     /// Flipper Zero color 16-bit UUIDs (black / white / transparent).
@@ -61,8 +61,7 @@ enum GadgetCatalog {
         if uuids.contains(biscuitServiceUUID) || raw == "Biscuit" {
             return hit("biscuit", "Biscuit wardrive rig", "rig", "[RIG:biscuit]")
         }
-        if raw.hasPrefix("Lilyshark") || lowered.hasPrefix("lilyshark")
-            || uuids.contains(lilysharkLSKServiceUUID) {
+        if raw.hasPrefix("Lilyshark") || lowered.hasPrefix("lilyshark") {
             return hit(
                 "lilyshark",
                 "Lilyshark T-Deck",

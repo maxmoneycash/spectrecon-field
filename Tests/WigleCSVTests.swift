@@ -84,6 +84,12 @@ final class WigleCSVTests: XCTestCase {
             "4B01"
         )
         XCTAssertNil(GadgetCatalog.lilysharkShortName(from: "Lilyshark T-Deck"))
+        XCTAssertNil(
+            GadgetCatalog.identify(
+                name: nil,
+                serviceUUIDs: [GadgetCatalog.lilysharkLSKServiceUUID]
+            )
+        )
         XCTAssertEqual(
             BLEScannerService.classify(
                 name: "ESP32",
